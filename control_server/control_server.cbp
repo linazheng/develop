@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="control_server" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="bin/Debug/control_server" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-g" />
+					<Add directory="include" />
+				</Compiler>
+			</Target>
+			<Target title="Release">
+				<Option output="bin/Release/control_server" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+					<Add option="-std=c++11" />
+					<Add directory="../framework/include" />
+					<Add directory="../boost_1_57_0" />
+					<Add directory="include" />
+					<Add directory="include/task" />
+					<Add directory="include/util" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+					<Add library="rt" />
+					<Add library="zhicloud_public" />
+					<Add library="pthread" />
+					<Add library="boost_atomic" />
+					<Add library="boost_chrono" />
+					<Add library="boost_date_time" />
+					<Add library="boost_exception" />
+					<Add library="boost_filesystem" />
+					<Add library="boost_log" />
+					<Add library="boost_random" />
+					<Add library="boost_signals" />
+					<Add library="boost_system" />
+					<Add library="boost_thread" />
+					<Add directory="../framework" />
+					<Add directory="../boost_1_57_0/stage/lib" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+			<Add option="-fexceptions" />
+		</Compiler>
+		<Unit filename="include/Address_manager.h" />
+		<Unit filename="include/ComputePool_manager.h" />
+		<Unit filename="include/Config_manager.h" />
+		<Unit filename="include/Expire_manager.h" />
+		<Unit filename="include/Forwarder_manager.h" />
+		<Unit filename="include/ISO_manager.h" />
+		<Unit filename="include/Image_manager.h" />
+		<Unit filename="include/Main_service.h" />
+		<Unit filename="include/Monitor_manager.h" />
+		<Unit filename="include/Port_manager.h" />
+		<Unit filename="include/Service_manager.h" />
+		<Unit filename="include/SnapshotPool_manager.h" />
+		<Unit filename="include/Status_manager.h" />
+		<Unit filename="include/Storage_manager.h" />
+		<Unit filename="include/task/Task_session.hpp" />
+		<Unit filename="include/task/Task_type.hpp" />
+		<Unit filename="include/util/Address_pool.hpp" />
+		<Unit filename="include/util/Compute_pool.hpp" />
+		<Unit filename="include/util/Compute_pool_status.hpp" />
+		<Unit filename="include/util/Default_compute_selector.hpp" />
+		<Unit filename="include/util/Disk_image.hpp" />
+		<Unit filename="include/util/Host_forwarder.hpp" />
+		<Unit filename="include/util/Host_info.hpp" />
+		<Unit filename="include/util/Host_status.hpp" />
+		<Unit filename="include/util/ISO_image.hpp" />
+		<Unit filename="include/util/Monitor_task.hpp" />
+		<Unit filename="include/util/Network_info.hpp" />
+		<Unit filename="include/util/Port_pool.hpp" />
+		<Unit filename="include/util/Server_info.hpp" />
+		<Unit filename="include/util/Server_status.hpp" />
+		<Unit filename="include/util/Service_staus.hpp" />
+		<Unit filename="include/util/Snapshot_pool.hpp" />
+		<Unit filename="include/util/Status_info.hpp" />
+		<Unit filename="include/util/Storage_pool.hpp" />
+		<Unit filename="include/util/System_status.hpp" />
+		<Unit filename="include/util/System_status_message.hpp" />
+		<Unit filename="include/util/Util.hpp" />
+		<Unit filename="main.cpp" />
+		<Unit filename="src/Address_manager.cpp" />
+		<Unit filename="src/ComputePool_manager.cpp" />
+		<Unit filename="src/Config_manager.cpp" />
+		<Unit filename="src/Expire_manager.cpp" />
+		<Unit filename="src/Forwarder_manager.cpp" />
+		<Unit filename="src/ISO_manager.cpp" />
+		<Unit filename="src/Image_manager.cpp" />
+		<Unit filename="src/Main_service.cpp" />
+		<Unit filename="src/Monitor_manager.cpp" />
+		<Unit filename="src/Port_manager.cpp" />
+		<Unit filename="src/Service_manager.cpp" />
+		<Unit filename="src/SnapshotPool_manager.cpp" />
+		<Unit filename="src/Status_manager.cpp" />
+		<Unit filename="src/Storage_manager.cpp" />
+		<Extensions>
+			<code_completion />
+			<debugger />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>
