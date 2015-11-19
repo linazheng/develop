@@ -19,14 +19,23 @@ namespace zhicloud
     namespace control_server{
         typedef string UUID_TYPE;
 
+        enum class StorageTypeEnum:uint32_t
+        {
+            local = 0,
+            cloud = 1,
+            nas = 2,
+            ip_san = 3,
+        };
+
         enum class UnitStatusEnum:uint32_t
         {
             status_running = 0,
             status_warning = 1,
             status_error = 2,
             status_stop = 3,
+            status_max = 4,
         };
-        
+
         enum class MonitorLevelEnum:uint32_t
         {
             system = 0,
@@ -43,6 +52,7 @@ namespace zhicloud
         {
             disabled = 0,
             enabled = 1,
+            unknown =2,
         };
 
 
@@ -57,15 +67,15 @@ namespace zhicloud
 
             }
 
-	   void setName(const string& name)
-	   {
-		_name = name;		
-	   }
+            void setName(const string& name)
+            {
+                _name = name;
+            }
 
-	   void setUUID(const UUID_TYPE& uuid)
-	   {
-		_uuid = uuid;		
-	   }
+            void setUUID(const UUID_TYPE& uuid)
+            {
+                _uuid = uuid;
+            }
             const string& getName() const
             {
                 return _name;

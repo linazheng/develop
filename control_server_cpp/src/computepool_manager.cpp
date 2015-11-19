@@ -2,6 +2,7 @@
 
 #include <util/generator.h>
 
+
 using namespace zhicloud;
 using namespace control_server;
 using namespace util;
@@ -67,7 +68,7 @@ bool ComputePoolManager::load()
 	}
 
 
-	boost::property_tree::ptree parser;
+    boost::property_tree::ptree parser;
     boost::property_tree::ini_parser::read_ini(_pool_config, parser);
 
 	uint32_t data_count = parser.get<uint32_t>("DEFAULT.data_count");
@@ -77,15 +78,16 @@ bool ComputePoolManager::load()
 
 	for(uint32_t index =0;index< data_count;index++){
 		string pool_uuid = parser.get<string>((boost::format("DEFAULT.uuid_%d")%index).str());
+
 		//read /var/zhicloud/config/control_server/resource/compute/uuid/pool.info
 
-		stringstream ss;
-        ss << _pool_path << pool_uuid<<"/pool.info";
-		string pool_name = ss.str();
+                stringstream ss;
+                ss << _pool_path << pool_uuid<<"/pool.info";
+                string pool_name = ss.str();
 
 		if(!boost::filesystem::exists(pool_name)){
-            _logger->error(boost::format("<ComputePoolManager>  pool.info not exist '%s'") %pool_name.c_str());
-            continue;
+                     _logger->error(boost::format("<ComputePoolManager>  pool.info not exist '%s'") %pool_name.c_str());
+                    continue;
 		}
 
 
@@ -133,15 +135,15 @@ bool ComputePoolManager::load()
 			{
 				string resource_name = pool_parser.get<string>((boost::format("DEFAULT.resource_%d")%resource_index).str());
 				stringstream tmp;
-                tmp << _pool_path <<pool_uuid<<"/resource_"<< resource_name<<".info";
+                                   tmp << _pool_path <<pool_uuid<<"/resource_"<< resource_name<<".info";
 				resource_name = tmp.str();
 
 				if(!boost::filesystem::exists(resource_name)){
-                    _logger->error(boost::format("<ComputePoolManager>  resource.info not exist '%s'") %resource_name.c_str());
-                    continue;
+                                     _logger->error(boost::format("<ComputePoolManager>  resource.info not exist '%s'") %resource_name.c_str());
+                                    continue;
 				}
 
-                _logger->info(boost::format("<ComputePoolManager> begin read '%s'") %resource_name.c_str());
+                                   _logger->info(boost::format("<ComputePoolManager> begin read '%s'") %resource_name.c_str());
 				//read /var/zhicloud/config/control_server/resource/compute/uuid/resource.info
 				boost::property_tree::ptree resource_parser;
 				boost::property_tree::ini_parser::read_ini(resource_name, resource_parser);
@@ -149,6 +151,7 @@ bool ComputePoolManager::load()
 				ComputeResource resource;
 				resource.setName(resource_parser.get<string>("DEFAULT.name"));
 				resource.setUUID(resource_parser.get<string>("DEFAULT.server"));
+				resource.setStatus(OptionStatusEnum(resource_parser.get<uint32_t>("DEFAULT.status")));
 
 				uint32_t host_count = resource_parser.get<uint32_t>("DEFAULT.host_count");
 				for(uint32_t host_index = 0;host_index < host_count;host_index++){
@@ -164,9 +167,7 @@ bool ComputePoolManager::load()
 		_compute_pool.emplace(pool.getUUID(),pool);
 		_logger->info(boost::format("<ComputePoolManager> add pool '%s'") %pool.getUUID().c_str());
 
-
 	}
-
 
 	return true;
  }
@@ -185,7 +186,7 @@ bool ComputePoolManager::load()
         {
             if (boost::filesystem::is_directory(iter->status()))
             {
-                string name = iter->path().string();
+                string name = iter->path().filename().string();
                 auto iter = _compute_pool.find(name);
                 if(iter !=  _compute_pool.end())
                 {
@@ -198,11 +199,9 @@ bool ComputePoolManager::load()
             }
         }
 
-        stringstream ss;
-        ss << _pool_path << "compute_pool.info";
         try {
-            boost::property_tree::ini_parser::write_ini(ss.str(), parser);
-            _logger->info(boost::format("<ComputePoolManager> savePoolList pool list to '%s'") %ss.str());
+            boost::property_tree::ini_parser::write_ini(_pool_config, parser);
+            _logger->info(boost::format("<ComputePoolManager> savePoolList pool list to '%s'") %_pool_config);
          }catch(std::exception &ex) {
             _logger->error(boost::format("<ConfigManager> savePoolList exception: %s")%ex.what());
          }
@@ -219,7 +218,7 @@ bool ComputePoolManager::savePoolInfo(const UUID_TYPE& pool_id)
         boost::property_tree::ptree parser;
 
         parser.put<string>("DEFAULT.name", pool.getName());
-        parser.put<string>("DEFAULT.server", pool.getUUID());
+        parser.put<string>("DEFAULT.uuid", pool.getUUID());
         parser.put<uint32_t>("DEFAULT.status", uint32_t(pool.getStatus()));
         parser.put<string>("DEFAULT.network", pool.getNetWork());
         parser.put<uint32_t>("DEFAULT.network_type", uint32_t(pool.getNetWorkType()));
@@ -245,7 +244,15 @@ bool ComputePoolManager::savePoolInfo(const UUID_TYPE& pool_id)
 
 
         try{
-            boost::property_tree::ini_parser::write_ini(_pool_config, parser);
+            stringstream ss;
+            ss << _pool_path << pool_id;
+
+            if(!boost::filesystem::exists(ss.str()))
+                boost::filesystem::create_directory(_pool_path);
+
+            ss <<"/pool.info";
+
+            boost::property_tree::ini_parser::write_ini(ss.str(), parser);
             _logger->info(boost::format("<ComputePoolManager> savePoolInfo pool id '%s' to '%s'") %pool_id.c_str() %_pool_config.c_str());
             return true;
         }catch(std::exception &ex) {
@@ -262,9 +269,8 @@ bool ComputePoolManager::savePoolInfo(const UUID_TYPE& pool_id)
 bool ComputePoolManager::savePoolResource(const UUID_TYPE& pool_id,const UUID_TYPE& resource_name)
 {
     lock_type lock(_mutex);
-    //auto iter =_compute_pool.find(pool_id);
     ComputeResource resource;
-    //if(iter != _compute_pool.end() && iter->second.getResource(resource_name,resource))
+
     if(getResource(pool_id,resource_name,resource))
     {
         boost::property_tree::ptree parser;
@@ -284,17 +290,18 @@ bool ComputePoolManager::savePoolResource(const UUID_TYPE& pool_id,const UUID_TY
 
         }
 
-         stringstream ss;
-         ss << _pool_path << pool_id << "/";
-
-         if(! boost::filesystem::exists(ss.str()))
-            boost::filesystem::create_directory(ss.str());
-
-        string path = (boost::format("resource_%s.info")%resource_name).str();
-        ss << path;
-        path = ss.str();
-
         try{
+            stringstream ss;
+            ss << _pool_path << pool_id << "/";
+
+            if(! boost::filesystem::exists(ss.str()))
+                boost::filesystem::create_directory(ss.str());
+
+            string path = (boost::format("resource_%s.info")%resource_name).str();
+            ss << path;
+            path = ss.str();
+
+
             boost::property_tree::ini_parser::write_ini(path, parser);
             _logger->info(boost::format("<ComputePoolManager> savePoolResource pool id '%s' to '%s'") %pool_id.c_str() %path.c_str());
             return true;
@@ -303,8 +310,8 @@ bool ComputePoolManager::savePoolResource(const UUID_TYPE& pool_id,const UUID_TY
          }
 
     }
-     _logger->error(boost::format("<ComputePoolManager> savePoolResource fail,invaild pool id '%s'") %pool_id.c_str());
-	return false;
+    _logger->error(boost::format("<ComputePoolManager> savePoolResource fail,invaild pool id '%s'") %pool_id.c_str());
+    return false;
 }
 
 void ComputePoolManager::deleteResourceFile(const UUID_TYPE& pool_id,const UUID_TYPE& resource_name)
@@ -331,9 +338,9 @@ void ComputePoolManager::deletePoolPath(const UUID_TYPE& pool_id)
         boost::filesystem::remove_all(path);
 }
 
-const UUID_TYPE&  ComputePoolManager::getDefaultPoolID() const
+void ComputePoolManager::getDefaultPoolID(string &pool_id) const
 {
-	return _default_pool;
+	pool_id = _default_pool;
 }
 
  bool ComputePoolManager::getDefaultPool(ComputePool &pool) const
@@ -343,6 +350,7 @@ const UUID_TYPE&  ComputePoolManager::getDefaultPoolID() const
 
  void ComputePoolManager::queryAllPool(map<UUID_TYPE,ComputePool> &compute_pool) const
  {
+    lock_type lock(_mutex);
     for(auto & item :_compute_pool)
     {
         compute_pool.emplace(item);
@@ -357,7 +365,7 @@ bool ComputePoolManager::createPool(ComputePool &pool)
     {
         if(item.second.getName() == pool.getName())
         {
-            _logger->error(boost::format("<ComputePoolManager> createPool faild already exists name '%s'") %pool.getName().c_str());
+            _logger->error(boost::format("<ComputePoolManager> createPool faild, already exists name '%s'") %pool.getName().c_str());
             return false;
         }
     }
@@ -430,6 +438,15 @@ bool ComputePoolManager::deletePool(const UUID_TYPE& pool_id)
         _compute_pool.erase(iter);
         deletePoolPath(pool_id);
         savePoolList();
+        //TODO:if delete default pool ,the _default_pool need to been sync ?
+        /*if(_default_pool == pool_id)
+        {
+            _default_pool = "";
+            if(_compute_pool.begin() != _compute_pool.end())
+            {
+                _default_pool = _compute_pool.begin()->first;
+            }
+        }*/
         _logger->error(boost::format("<ComputePoolManager> deletePool faild,invaild pool id '%s'") %pool_id.c_str());
         return true;
     }
@@ -439,7 +456,8 @@ bool ComputePoolManager::deletePool(const UUID_TYPE& pool_id)
 
 bool ComputePoolManager::containsPool(const UUID_TYPE& pool_id) const
 {
-	return ((_compute_pool.count(pool_id) == 1) ? true:false);
+    lock_type lock(_mutex);
+    return ((_compute_pool.count(pool_id) == 1) ? true:false);
 }
 
 bool ComputePoolManager::getPool(const UUID_TYPE& pool_id, ComputePool &pool) const

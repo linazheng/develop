@@ -77,14 +77,6 @@ namespace zhicloud
             set<UUID_TYPE> _allocated_hostid;
         };
 
-        enum class ComputeStorageTypeEnum:uint32_t
-        {
-            local = 0,
-            cloud = 1,
-            nas = 2,
-            ip_san = 3,
-        };
-
         enum class ComputeNetworkTypeEnum:uint32_t
         {
             privates = 0,
@@ -93,6 +85,7 @@ namespace zhicloud
             bridge = 3,
         };
 
+        typedef StorageTypeEnum ComputeStorageTypeEnum;
         typedef OptionStatusEnum HighAvaliableModeEnum;
         typedef OptionStatusEnum AutoQOSModeEnum;
         typedef OptionStatusEnum ThinProvisioningModeEnum;
@@ -185,7 +178,7 @@ namespace zhicloud
         private:
             void copy(const ComputePool& other)
             {
-                 _resource.clear();
+                _resource.clear();
                 _self  = other._self;
                 _status = other._status;
                 _network_uuid = other._network_uuid;

@@ -21,7 +21,7 @@ namespace zhicloud
             bool savePoolResource(const UUID_TYPE& pool_id,const UUID_TYPE& resource_name);
             void deleteResourceFile(const UUID_TYPE& pool_id,const UUID_TYPE& resource_name);
             void deletePoolPath(const UUID_TYPE& pool_id);
-            const UUID_TYPE&  getDefaultPoolID() const;
+            void getDefaultPoolID(string &pool_id) const;
             bool getDefaultPool(ComputePool &pool) const;
             void queryAllPool(map<UUID_TYPE,ComputePool> &compute_pool) const;
 

@@ -24,11 +24,6 @@ namespace zhicloud
             share = 2,
         };
 
-        enum class DiskTypeEnum:uint32_t
-        {
-            local = 0,
-            cloud = 1,
-        };
 
         enum class EnableLocalBackupEnum:uint32_t
         {
@@ -53,6 +48,8 @@ namespace zhicloud
             mjpeg = 0,
             h264 = 1,
         };
+
+        typedef StorageTypeEnum DiskTypeEnum;
 
         class HostPort{
         public:

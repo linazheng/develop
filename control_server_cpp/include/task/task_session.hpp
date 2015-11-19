@@ -3,7 +3,11 @@
 
 #include <transaction/transaction.hpp>
 #include <transaction/base_session.hpp>
-
+#include <transaction/base_task.hpp>
+#include <service/node_service.h>
+#include <util/logger.h>
+#include <util/define.hpp>
+#include <transport/app_message.h>
 #include "task_type.hpp"
 
 namespace zhicloud
@@ -13,11 +17,11 @@ namespace zhicloud
         public:
             TaskSession()
             {
-                onReset();
+
             }
             TaskSession(const session_id_type &session_id):BaseSession<TaskType>(session_id)
             {
-                onReset();
+
             }
 
             void onReset()

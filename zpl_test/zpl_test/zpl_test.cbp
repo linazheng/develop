@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="zpl_test" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="bin/Debug/zpl_test" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-std=c++11" />
+					<Add option="-g" />
+					<Add option="-pthread" />
+					<Add directory="include" />
+					<Add directory="../framework/include" />
+					<Add directory="include/service" />
+					<Add directory="../boost_1_57_0" />
+				</Compiler>
+				<Linker>
+					<Add library="zhicloud_public_d" />
+					<Add library="pthread" />
+					<Add library="boost_log" />
+					<Add library="boost_system" />
+					<Add library="boost_thread" />
+					<Add library="rt" />
+					<Add library="boost_chrono" />
+					<Add library="boost_filesystem" />
+					<Add directory="." />
+					<Add directory="../boost_1_57_0/stage/lib" />
+					<Add directory="../framework" />
+				</Linker>
+			</Target>
+			<Target title="Release">
+				<Option output="bin/Release/zpl_test" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+					<Add option="-std=c++11" />
+					<Add option="-pthread" />
+					<Add directory="include" />
+					<Add directory="../framework/include" />
+					<Add directory="include/service" />
+					<Add directory="../boost_1_57_0" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+					<Add library="zhicloud_public" />
+					<Add library="boost_log" />
+					<Add library="boost_system" />
+					<Add library="boost_filesystem" />
+					<Add library="pthread" />
+					<Add library="boost_thread" />
+					<Add library="rt" />
+					<Add library="boost_chrono" />
+					<Add directory="." />
+					<Add directory="../framework" />
+					<Add directory="../boost_1_57_0/stage/lib" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+			<Add option="-fexceptions" />
+			<Add directory="../../boost_1_57_0" />
+		</Compiler>
+		<Linker>
+			<Add directory="../../boost_1_57_0/stage/lib" />
+		</Linker>
+		<Unit filename="include/service/active_queue_event_sender.hpp" />
+		<Unit filename="include/service/active_queue_test.h" />
+		<Unit filename="include/service/event_test.h" />
+		<Unit filename="include/service/message_queue_test.h" />
+		<Unit filename="include/service/passive_queue_event_sender.hpp" />
+		<Unit filename="include/service/passive_queue_test.h" />
+		<Unit filename="include/service/service_unify_test.h" />
+		<Unit filename="include/service/timed_invoker_test.h" />
+		<Unit filename="include/service/timer_service_capacity.hpp" />
+		<Unit filename="include/service/timer_service_clear_timer.hpp" />
+		<Unit filename="include/service/timer_service_loop_timer.hpp" />
+		<Unit filename="include/service/timer_service_normal_timer.hpp" />
+		<Unit filename="include/service/timer_service_performance.hpp" />
+		<Unit filename="include/service/timer_service_test.h" />
+		<Unit filename="include/transaction/base_manager_test.h" />
+		<Unit filename="include/transaction/transaction_unify_test.h" />
+		<Unit filename="include/transport/packet_handler_client_server.hpp" />
+		<Unit filename="include/transport/packet_handler_test.h" />
+		<Unit filename="include/transport/transport_unify_test.h" />
+		<Unit filename="include/transport/transporter_client.hpp" />
+		<Unit filename="include/transport/transporter_server.hpp" />
+		<Unit filename="include/transport/transporter_test.h" />
+		<Unit filename="include/util/digest_test.h" />
+		<Unit filename="include/util/domain_utility_test.h" />
+		<Unit filename="include/util/generator_test.h" />
+		<Unit filename="include/util/lc/appender.h" />
+		<Unit filename="include/util/lc/async_appender.h" />
+		<Unit filename="include/util/lc/async_file_appender.h" />
+		<Unit filename="include/util/lc/block_queue.hpp" />
+		<Unit filename="include/util/lc/file_appender.h" />
+		<Unit filename="include/util/lc/logger.h" />
+		<Unit filename="include/util/lc/logger_manager.h" />
+		<Unit filename="include/util/lc/logging.h" />
+		<Unit filename="include/util/lc/logging_event.h" />
+		<Unit filename="include/util/lc/logging_time.h" />
+		<Unit filename="include/util/lc/singleton.h" />
+		<Unit filename="include/util/logging_test.h" />
+		<Unit filename="include/util/serial_test.h" />
+		<Unit filename="include/util/utility_test.h" />
+		<Unit filename="main.cpp" />
+		<Unit filename="readme.txt" />
+		<Unit filename="release_notes.txt" />
+		<Unit filename="src/service/active_queue_test.cpp" />
+		<Unit filename="src/service/event_test.cpp" />
+		<Unit filename="src/service/message_queue_test.cpp" />
+		<Unit filename="src/service/node_service_test.cpp" />
+		<Unit filename="src/service/passive_queue_test.cpp" />
+		<Unit filename="src/service/service_unify_test.cpp" />
+		<Unit filename="src/service/timed_invoker_test.cpp" />
+		<Unit filename="src/service/timer_service_test.cpp" />
+		<Unit filename="src/transaction/base_manager_test.cpp" />
+		<Unit filename="src/transaction/transaction_unify_test.cpp" />
+		<Unit filename="src/transport/packet_handler_test.cpp" />
+		<Unit filename="src/transport/transport_unify_test.cpp" />
+		<Unit filename="src/transport/transporter_test.cpp" />
+		<Unit filename="src/util/digest_test.cpp" />
+		<Unit filename="src/util/domain_utility_test.cpp" />
+		<Unit filename="src/util/generator_test.cpp" />
+		<Unit filename="src/util/lc/appender.cpp" />
+		<Unit filename="src/util/lc/async_appender.cpp" />
+		<Unit filename="src/util/lc/async_file_appender.cpp" />
+		<Unit filename="src/util/lc/file_appender.cpp" />
+		<Unit filename="src/util/lc/logger.cpp" />
+		<Unit filename="src/util/lc/logger_manager.cpp" />
+		<Unit filename="src/util/lc/logging.cpp" />
+		<Unit filename="src/util/logging_test.cpp" />
+		<Unit filename="src/util/serial_test.cpp" />
+		<Unit filename="src/util/utility_test.cpp" />
+		<Unit filename="update_list.txt" />
+		<Extensions>
+			<code_completion />
+			<debugger />
+			<envvars />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

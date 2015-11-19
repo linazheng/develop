@@ -64,12 +64,14 @@
 		<Unit filename="include/iso_manager.h" />
 		<Unit filename="include/main_service.h" />
 		<Unit filename="include/monitor_manager.h" />
+		<Unit filename="include/network_manager.h" />
 		<Unit filename="include/port_manager.h" />
 		<Unit filename="include/service_manager.h" />
 		<Unit filename="include/snapshotpool_manager.h" />
 		<Unit filename="include/status_manager.h" />
 		<Unit filename="include/storage_manager.h" />
 		<Unit filename="include/task/clienttrans_manager.h" />
+		<Unit filename="include/task/query_computepool.h" />
 		<Unit filename="include/task/task_session.hpp" />
 		<Unit filename="include/task/task_type.hpp" />
 		<Unit filename="include/util/address_pool.hpp" />
@@ -103,12 +105,14 @@
 		<Unit filename="src/iso_manager.cpp" />
 		<Unit filename="src/main_service.cpp" />
 		<Unit filename="src/monitor_manager.cpp" />
+		<Unit filename="src/network_manager.cpp" />
 		<Unit filename="src/port_manager.cpp" />
 		<Unit filename="src/service_manager.cpp" />
 		<Unit filename="src/snapshotpool_manager.cpp" />
 		<Unit filename="src/status_manager.cpp" />
 		<Unit filename="src/storage_manager.cpp" />
 		<Unit filename="src/task/clienttrans_manager.cpp" />
+		<Unit filename="src/task/query_computepool.cpp" />
 		<Extensions>
 			<code_completion />
 			<debugger />
