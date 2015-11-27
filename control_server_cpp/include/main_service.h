@@ -77,6 +77,13 @@ namespace zhicloud
             void onStatusCheckTimeout();
             void reportStatisticData();
 
+            void notifySystemMonitorData(Monitor monitor);
+            void notifyServerRoomMonitorData(Monitor monitor);
+            void notifyServerRackMonitorData(Monitor monitor);
+            void notifyServerMonitorData(Monitor monitor);
+            void notifyComputeNodeMonitorData(Monitor monitor);
+            void notifyHostMonitorData(Monitor monitor);
+
         private:
             const static string version;
             const static string config_root;

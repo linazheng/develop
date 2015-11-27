@@ -48,7 +48,7 @@ namespace zhicloud
              }
 
             void setName(const string& value) {_name = value;}
-            void setUUID(const string& value) {_server_uuid = value;}
+            void setServerUUID(const string& value) {_server_uuid = value;}
             void setStatus(const OptionStatusEnum& value) {_status = value;}
             void setHost(const UUID_TYPE& value) {  _allocated_hostid.emplace(value); }
 
@@ -65,9 +65,8 @@ namespace zhicloud
                 _name  = other._name;
                 _server_uuid = other._server_uuid;
                 _status = other._status;
+                _allocated_hostid =other._allocated_hostid;
 
-                for(const auto& item: other._allocated_hostid)
-                    _allocated_hostid.emplace(item);
             }
 
 
@@ -191,10 +190,7 @@ namespace zhicloud
                 _auto_qos = other._auto_qos;
                 _thin_provisioning = other._thin_provisioning;
                 _backing_image = other._backing_image;
-
-
-                for(const auto& item: other._resource)
-                    _resource.emplace(item);
+                _resource = other._resource;
             }
 
             BaseSelfInfo _self;

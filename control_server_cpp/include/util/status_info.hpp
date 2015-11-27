@@ -188,7 +188,7 @@ namespace zhicloud
                 value.emplace_back(_receive);
                 value.emplace_back(_send);
             }
-            
+
             const uint64_t& getRead()const { return _read;}
             const uint64_t& getWrite()const { return _write;}
             const uint64_t& getReceive()const { return _receive;}
@@ -203,7 +203,7 @@ namespace zhicloud
 
         class BaseCounter{
         public:
-            BaseCounter():_status(UnitStatusEnum::status_running)
+            BaseCounter():_memory_usage(0.0),_disk_usage(0.0),_status(UnitStatusEnum::status_running)
             {
             }
 
@@ -214,6 +214,9 @@ namespace zhicloud
             const TrafficCounter& getNetworkCounter()const { return network_io; }
             const DiskSpeedCounter& getSpeedCounter()const { return _speed; }
             const UnitStatusEnum& getStatus()const { return _status; }
+            const float& getMemoryUsage()const { return _memory_usage; }
+            const float& getDiskUsage()const { return _disk_usage; }
+            const string& getTimeStamp()const { return _timestamp; }
 
             void setCpuCounter(const CpuCounter& value) {  _cpu = value; }
             void setMemoryCounter(const ResourceCounter& value) { _memory = value; }
@@ -222,17 +225,23 @@ namespace zhicloud
             void setNetworkCounter(const TrafficCounter& value) {  network_io = value; }
             void setSpeedCounter(const DiskSpeedCounter& value) {  _speed = value; }
             void setStatus(const UnitStatusEnum& value) {  _status = value; }
+            void setMemoryUsage(const float& value) {  _memory_usage = value; }
+            void setDiskUsage(const float& value) {  _disk_usage = value; }
+            void setTimeStamp(const string& value) {  _timestamp = value; }
 
 
         private:
             CpuCounter _cpu;
             ResourceCounter _memory;// ##[available, total]
+            float _memory_usage;
             ResourceCounter _disk;// ##[available, total]
+            float _disk_usage;
             DiskCounter _disk_io;//read_count, read_bytes, write_count, write_bytes, io_error
             TrafficCounter network_io;//##receive_bytes, receive_packets, receive_error, receive_drop,send_bytes, send_packets, send_error, send_drop
             DiskSpeedCounter _speed;
             string _timestamp;
             UnitStatusEnum _status;
+
         };
     }
 }

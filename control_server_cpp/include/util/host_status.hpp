@@ -27,7 +27,7 @@ namespace zhicloud
         };
         class HostStatus{
         public:
-            HostStatus():_memory_usage(0.0),_disk_usage(0.0)
+            HostStatus()
             {
 
             }
@@ -48,15 +48,11 @@ namespace zhicloud
             const UUID_TYPE& getUUID()const { return  _uuid; }
             const UUID_TYPE& getServerUUID()const { return _server_uuid; }
             const HostIp& getHostIp()const { return _ip; }
-            const float& getMemoryUsage() const { return _memory_usage;}
-            const float& getDiskUsage() const { return _disk_usage;}
             const BaseCounter& getBaseCounter() const { return _counter;}
 
             void setUUID(const UUID_TYPE& value){ _uuid = value; }
             void setServerUUID(const UUID_TYPE& value) { _server_uuid = value; }
             void setHostIp(const HostIp& value) {  _ip = value; }
-            void setMemoryUsage(const float& value) { _memory_usage = value;}
-            void setDiskUsage(const float& value) { _disk_usage = value;}
             void setBaseCounter(const BaseCounter& value) {_counter = value;}
 
         private:
@@ -64,8 +60,6 @@ namespace zhicloud
             void copy(const HostStatus& other)
             {
                 _counter = other._counter;
-                _memory_usage = other._memory_usage;
-                _disk_usage = other._disk_usage;
                 _server_uuid = other._server_uuid;
                 _uuid = _uuid;
                 _ip = other._ip;
@@ -73,8 +67,6 @@ namespace zhicloud
             }
 
             BaseCounter _counter;
-            float _memory_usage;
-            float _disk_usage;
             UUID_TYPE _server_uuid;//##server uuid
             UUID_TYPE _uuid;
             HostIp _ip;//##[target_ip, public_ip]

@@ -150,7 +150,7 @@ bool ComputePoolManager::load()
 
 				ComputeResource resource;
 				resource.setName(resource_parser.get<string>("DEFAULT.name"));
-				resource.setUUID(resource_parser.get<string>("DEFAULT.server"));
+				resource.setServerUUID(resource_parser.get<string>("DEFAULT.server"));
 				resource.setStatus(OptionStatusEnum(resource_parser.get<uint32_t>("DEFAULT.status")));
 
 				uint32_t host_count = resource_parser.get<uint32_t>("DEFAULT.host_count");
@@ -261,7 +261,7 @@ bool ComputePoolManager::savePoolInfo(const UUID_TYPE& pool_id)
 
 
     }
-    _logger->error(boost::format("<ComputePoolManager> savePoolInfo fail,invaild pool id '%s'") %pool_id.c_str());
+    _logger->error(boost::format("<ComputePoolManager> savePoolInfo fail,invaild pool id %s") %pool_id.c_str());
 	return false;
 
 }

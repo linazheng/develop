@@ -36,20 +36,6 @@ void QueryComputePoolTask::invokeSession(TaskSession &session)
         AppMessage::uint_array_type status;
 
         AppMessage::uint_array_type tmp;
-        
-        /*vector<string> name;
-        vector<UUID_TYPE> uuid;
-        vector<vector<uint64_t>> node;
-        vector<vector<uint64_t>> host;
-        vector<uint64_t> cpu_count;
-        vector<float> cpu_usage;
-        vector<vector<uint64_t>> memory;
-        vector<float> memory_usage;
-        vector<vector<uint64_t>> disk_volume;
-        vector<float> disk_usage;
-        vector<uint64_t> status;
-
-         vector<uint64_t> tmp;*/
 
         for(const auto & compute_pool :pool_list)
         {
@@ -103,7 +89,7 @@ void QueryComputePoolTask::invokeSession(TaskSession &session)
 
     }catch(exception& ex)
     {
-        _logger->error(boost::format("[%08X]exception when invoke query computepool, message:%s")
+        _logger->error(boost::format("[%08X]exception when invoke query computepool, message:'%s'")
                             %session.getSessionID() %ex.what());
         taskFail(session);
         return;

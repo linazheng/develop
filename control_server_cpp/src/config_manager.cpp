@@ -13,3 +13,13 @@ ConfigManager::~ConfigManager()
 {
 
 }
+
+bool ConfigManager::containsHost(const UUID_TYPE& host)
+{
+    return false;
+}
+
+bool ConfigManager::containsServer(const UUID_TYPE& server)
+{
+    return false;
+}

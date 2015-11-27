@@ -15,8 +15,13 @@ namespace zhicloud
         public:
             ConfigManager(const string &logger_name);
             ~ConfigManager();
+
+            bool containsHost(const string& host);
+            bool containsServer(const string& server);
+
         protected:
             ConfigManager(){}
+
         private:
             typedef unique_lock<recursive_mutex> lock_type;
             mutable recursive_mutex _mutex;

@@ -268,10 +268,16 @@ void MainService::handleTimeout(AppMessage& event, const string& sender)
 
 void MainService::handleServiceStatusChanged(AppMessage& event, const string& sender)
 {
+
 }
 
 void MainService::handleMonitorHeartBeat(AppMessage& event, const string& sender)
 {
+    uint32_t task_id = 0;
+    event.getUInt(ParamEnum::task,task_id);
+
+    if(task_id > 0)
+        _monitor_manager->processHeartBeat(task_id);
 }
 
 void MainService::handleKeepAlive(AppMessage& event, const string& sender)
@@ -429,16 +435,111 @@ void MainService::onStatisticServerDisconnected(const string& node_name)
         clearTimer(statistic_timer_id);
         statistic_timer_id = 0;
         _statistic_server ="";
-        logger->info(boost::format("statistic server disconnected, stop report for server '%s'") %node_name);
+        logger->info(boost::format("statistic server disconnected, stop report for server %s") %node_name);
     }
 }
 
 void MainService::handleStartMonitorRequest(AppMessage& event, const string& sender)
 {
+    MonitorTask task;
+    task.setReceivedNode(sender);
+    task.setReceivedSession(event.session);
+    vector<string> target_list;
+    event.getStringArray(ParamEnum::target,target_list);
+    task.addTargetList(target_list);
+
+    uint32_t level = 0;
+    event.getUInt(ParamEnum::task,level);
+    task.setLevel(MonitorLevelEnum(level));
+
+    logger->info(boost::format("<control_service> receive start monitor request from %s, request session [%08X] monitor level %d")
+                            %sender %event.session %level);
+
+    bool ret = true;
+    AppMessage response(AppMessage::message_type::RESPONSE, RequestEnum::start_monitor);
+    response.session = event.session;
+
+    if(!task.conatinTarget())
+        task.setGlobalMonitor(true);
+
+    switch(MonitorLevelEnum(level))
+    {
+        case MonitorLevelEnum::server_room:
+            ret = false;
+        break;
+        case MonitorLevelEnum::server_rack:
+            ret = false;
+        break;
+        case MonitorLevelEnum::server:
+        {
+            for( auto &item : target_list ){
+                ret = _config_manager->containsServer(item);
+                if(!ret){
+                    logger->error(boost::format("<control_service> handleStartMonitorRequest start monitor fail, invalid target server id %s") %item);
+                    break;
+                }
+
+            }
+
+        }
+        break;
+        case MonitorLevelEnum::compute_node:
+        {
+            UUID_TYPE pool_id;
+            for( auto &item : target_list ){
+                ret = _computepool_manager->searchResource(item,pool_id);
+                if(!ret){
+                    logger->error(boost::format("<control_service> handleStartMonitorRequest start monitor fail, invalid target compute resource %s") %item);
+                    break;
+                }
+
+            }
+
+        }
+        break;
+        case MonitorLevelEnum::host:
+        {
+            for( auto &item : target_list ){
+                ret = _config_manager->containsHost(item);
+                if(!ret){
+                    logger->error(boost::format("<control_service> handleStartMonitorRequest start monitor fail, invalid target host id %s") %item);
+                    break;
+                }
+
+            }
+        }
+        break;
+        default:
+            ret = false;
+        break;
+    }
+
+    if(ret){
+        if(_monitor_manager->addTask(task))
+        {
+            response.setUInt(ParamEnum::task, task.getTaskID());
+        }else
+        {
+            ret = false;
+        }
+    }
+
+    response.success = ret;
+    sendMessage(response, sender);
 }
 
 void MainService::handleStopMonitorRequest(AppMessage& event, const string& sender)
 {
+    uint32_t task_id = 0;
+    event.getUInt(ParamEnum::task,task_id);
+
+    AppMessage response(AppMessage::message_type::RESPONSE, RequestEnum::stop_monitor);
+    response.session = event.session;
+    response.success =_monitor_manager->removeTask(task_id);
+    sendMessage(response, sender);
+
+    logger->info(boost::format("<control_service> receive stop monitor request from %s, request session [%08X]")
+                            %sender %event.session);
 
 }
 
@@ -477,6 +578,199 @@ void MainService::handleStatisticKeepAlive()
 
 void MainService::handleMonitorTimeout()
 {
+    _monitor_manager->checkTimeout();
+    vector<Monitor> monitor_list;
+    _monitor_manager->getAllMonitor(monitor_list);
+
+   for(auto& monitor : monitor_list)
+   {
+        if(monitor.hasTarget())
+        {
+            switch(monitor.getLevel())
+            {
+                case MonitorLevelEnum::system:
+                    notifySystemMonitorData(monitor);
+                break;
+                case MonitorLevelEnum::server_room:
+                    notifyServerRoomMonitorData(monitor);
+                break;
+                case MonitorLevelEnum::server_rack:
+                    notifyServerRackMonitorData(monitor);
+                break;
+                case MonitorLevelEnum::server:
+                    notifyServerMonitorData(monitor);
+                break;
+                case MonitorLevelEnum::compute_node:
+                    notifyComputeNodeMonitorData(monitor);
+                break;
+                case MonitorLevelEnum::host:
+                    notifyHostMonitorData(monitor);
+                break;
+                default:
+                break;
+            }
+        }
+   }
+}
+
+void MainService::notifySystemMonitorData(Monitor monitor)
+{
+    if(!monitor.hasListener()) return;
+    AppMessage event(AppMessage::message_type::RESPONSE, EventEnum::monitor_data);
+}
+
+void MainService::notifyServerRoomMonitorData(Monitor monitor)
+{
+    if(!monitor.hasListener()) return;
+    AppMessage event(AppMessage::message_type::RESPONSE, EventEnum::monitor_data);
+
+}
+
+void MainService::notifyServerRackMonitorData(Monitor monitor)
+{   if(!monitor.hasListener()) return;
+    AppMessage event(AppMessage::message_type::RESPONSE, EventEnum::monitor_data);
+
+}
+
+void MainService::notifyServerMonitorData(Monitor monitor)
+{
+    if(!monitor.hasListener()) return;
+    AppMessage event(AppMessage::message_type::RESPONSE, EventEnum::monitor_data);
+
+}
+
+void MainService::notifyHostMonitorData(Monitor monitor)
+{
+    if(!monitor.hasListener()) return;
+    AppMessage event(AppMessage::message_type::RESPONSE, EventEnum::monitor_data);
+
+}
+
+void MainService::notifyComputeNodeMonitorData(Monitor monitor)
+{
+    if(!monitor.hasListener()) return;
+
+    map<uint32_t,vector<ComputeResource>> dispatch_map;
+
+    for(auto& listener_id : monitor.getListener())
+        dispatch_map[listener_id] = move(vector<ComputeResource>());
+
+    for(auto& target_id : monitor.getTargetList())
+    {
+        UUID_TYPE pool_id;
+        if(_computepool_manager->searchResource(target_id.first,pool_id))
+        {
+            ComputeResource resource;
+            if(_computepool_manager->getResource(pool_id,target_id.first,resource))
+            {
+                 for(auto& item : dispatch_map)
+                    dispatch_map[item.first].emplace_back(resource);
+            }
+        }
+    }
+
+    map<UUID_TYPE,ComputePool> compute_pool;
+    vector<ComputeResource> resource_list;
+    _computepool_manager->queryAllPool(compute_pool);
+    for(auto& pool : compute_pool)
+    {
+        _computepool_manager->queryResource(pool.first,resource_list);
+    }
+
+    for(auto& item : dispatch_map)
+    {
+        for(auto& resource : resource_list)
+        {
+             dispatch_map[item.first].emplace_back(resource);
+        }
+    }
+
+
+    AppMessage::string_array_type name;
+    AppMessage::uint_array_type number;
+    AppMessage::uint_array_type cpu_count;
+    AppMessage::float_array_type cpu_usage;
+    AppMessage::uint_array_array_type memory;
+    AppMessage::float_array_type memory_usage;
+    AppMessage::uint_array_array_type disk_volume;
+    AppMessage::float_array_type disk_usage;
+    AppMessage::uint_array_array_type disk_io;
+    AppMessage::uint_array_array_type network_io;
+    AppMessage::uint_array_array_type speed;
+    AppMessage::string_array_type timestamp;
+    AppMessage::uint_array_type status_list;
+
+    AppMessage::uint_array_type tmp_num;
+
+    MonitorTask task;
+    ServerStatus status;
+    for(auto& item : dispatch_map)
+    {
+
+        if(_monitor_manager->getTask(item.first,task))
+        {
+            AppMessage event(AppMessage::message_type::RESPONSE, EventEnum::monitor_data);
+            event.success = true;
+            event.session = task.getReceivedSession();
+            event.setUInt(ParamEnum::task, task.getTaskID());
+            event.setUInt(ParamEnum::level, uint32_t(task.getLevel()));
+
+
+            name.clear();
+            number.clear();
+            cpu_count.clear();
+            cpu_usage.clear();
+            memory.clear();
+            memory_usage.clear();
+            disk_volume.clear();
+            disk_usage.clear();
+            disk_io.clear();
+            network_io.clear();
+            speed.clear();
+            timestamp.clear();
+            status_list.clear();
+
+            for(auto& resource : item.second)
+            {
+                if(_status_manager->getServerStatus(resource.getServerUUID(),status))
+                {
+                    name.emplace_back(resource.getName());
+                    number.emplace_back(resource.getHostSize());
+                    cpu_count.emplace_back(status.getCounter().getCpuCounter().getCpuCount());
+                    cpu_usage.emplace_back(status.getCounter().getCpuCounter().getCpuUsage());
+
+                    status.getCounter().getMemoryCounter().transfertoArray(tmp_num);
+                    memory.emplace_back(tmp_num);
+                    memory_usage.emplace_back(status.getCounter().getMemoryUsage());
+
+
+                    status.getCounter().getDiskCounter().transfertoArray(tmp_num);
+                    disk_volume.emplace_back(tmp_num);
+                    disk_usage.emplace_back(status.getCounter().getDiskUsage());
+
+                    status.getCounter().getDiskIOCounter().transfertoArray(tmp_num);
+                    disk_io.emplace_back(tmp_num);
+
+                    status.getCounter().getNetworkCounter().transfertoArray(tmp_num);
+                    network_io.emplace_back(tmp_num);
+
+                    status.getCounter().getSpeedCounter().transfertoArray(tmp_num);
+                    speed.emplace_back(tmp_num);
+
+                    timestamp.emplace_back(status.getCounter().getTimeStamp());
+                    status_list.emplace_back(uint64_t(status.getCounter().getStatus()));
+                }
+
+            }
+            sendMessage(event, task.getReceivedNode());
+        }
+
+    }
+
+
+
+
+
 }
 
 void MainService::handleStatisticCheckTimeout()
